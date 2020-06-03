@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jmu.hkx.dao.MessageMapper">
+  <resultMap id="BaseResultMap" type="jmu.hkx.vo.Message">
+    <id column="messageID" jdbcType="INTEGER" property="messageid" />
+    <result column="messageContent" jdbcType="VARCHAR" property="messagecontent" />
+    <result column="writeDate" jdbcType="TIMESTAMP" property="writedate" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="productID" jdbcType="INTEGER" property="productid" />
+    <result column="userID" jdbcType="CHAR" property="userid" />
+  </resultMap>
+  <resultMap id="WithUserResultMap" type="jmu.hkx.vo.Message">
+    <id column="messageID" jdbcType="INTEGER" property="messageid" />
+    <result column="messageContent" jdbcType="VARCHAR" property="messagecontent" />
+    <result column="writeDate" jdbcType="TIMESTAMP" property="writedate" />
+    <result column="count" jdbcType="INTEGER" property="count" />
+    <result column="productID" jdbcType="INTEGER" property="productid" />
+    <association property="user" javaType="User">
+        <id column="userID" property="userid"/>
+        <result column="userName" property="username"/>
+        <result column="userImage" property="userimage"/>
+    </association>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    messageID, messageContent, writeDate, count, productID, userID
+  </sql>
+  <sql id="WithUser_Column_List">
+    messageID, messageContent, writeDate, count, productID,user.userID,userName,userImage
+  </sql>
+  <!--带user查询
+    Message selectByPrimaryKeyWithUser(Integer messageid);
+    -->
+  <select id="selectByPrimaryKeyWithUser" resultMap="WithUserResultMap">
+      select 
+    <include refid="WithUser_Column_List" />
+    from message left join user on message.userID=user.userID
+    where messageID = #{messageid,jdbcType=INTEGER}
+  </select>
+  
+  <!-- selectByExampleWithUser 带user条件查询 -->
+  <select id="selectByExampleWithUser"  resultMap="WithUserResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="WithUser_Column_List" />
+     from message left join user on message.userID=user.userID
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" parameterType="jmu.hkx.vo.MessageExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from message
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from message
+    where messageID = #{messageid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from message
+    where messageID = #{messageid,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="jmu.hkx.vo.MessageExample">
+    delete from message
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="jmu.hkx.vo.Message">
+    insert into message (messageID, messageContent, writeDate, 
+      count, productID, userID
+      )
+    values (#{messageid,jdbcType=INTEGER}, #{messagecontent,jdbcType=VARCHAR}, #{writedate,jdbcType=TIMESTAMP}, 
+      #{count,jdbcType=INTEGER}, #{productid,jdbcType=INTEGER}, #{userid,jdbcType=CHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="jmu.hkx.vo.Message">
+    insert into message
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="messageid != null">
+        messageID,
+      </if>
+      <if test="messagecontent != null">
+        messageContent,
+      </if>
+      <if test="writedate != null">
+        writeDate,
+      </if>
+      <if test="count != null">
+        count,
+      </if>
+      <if test="productid != null">
+        productID,
+      </if>
+      <if test="userid != null">
+        userID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="messageid != null">
+        #{messageid,jdbcType=INTEGER},
+      </if>
+      <if test="messagecontent != null">
+        #{messagecontent,jdbcType=VARCHAR},
+      </if>
+      <if test="writedate != null">
+        #{writedate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="count != null">
+        #{count,jdbcType=INTEGER},
+      </if>
+      <if test="productid != null">
+        #{productid,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null">
+        #{userid,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="jmu.hkx.vo.MessageExample" resultType="java.lang.Long">
+    select count(*) from message
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update message
+    <set>
+      <if test="record.messageid != null">
+        messageID = #{record.messageid,jdbcType=INTEGER},
+      </if>
+      <if test="record.messagecontent != null">
+        messageContent = #{record.messagecontent,jdbcType=VARCHAR},
+      </if>
+      <if test="record.writedate != null">
+        writeDate = #{record.writedate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.count != null">
+        count = #{record.count,jdbcType=INTEGER},
+      </if>
+      <if test="record.productid != null">
+        productID = #{record.productid,jdbcType=INTEGER},
+      </if>
+      <if test="record.userid != null">
+        userID = #{record.userid,jdbcType=CHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update message
+    set messageID = #{record.messageid,jdbcType=INTEGER},
+      messageContent = #{record.messagecontent,jdbcType=VARCHAR},
+      writeDate = #{record.writedate,jdbcType=TIMESTAMP},
+      count = #{record.count,jdbcType=INTEGER},
+      productID = #{record.productid,jdbcType=INTEGER},
+      userID = #{record.userid,jdbcType=CHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="jmu.hkx.vo.Message">
+    update message
+    <set>
+      <if test="messagecontent != null">
+        messageContent = #{messagecontent,jdbcType=VARCHAR},
+      </if>
+      <if test="writedate != null">
+        writeDate = #{writedate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="count != null">
+        count = #{count,jdbcType=INTEGER},
+      </if>
+      <if test="productid != null">
+        productID = #{productid,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null">
+        userID = #{userid,jdbcType=CHAR},
+      </if>
+    </set>
+    where messageID = #{messageid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="jmu.hkx.vo.Message">
+    update message
+    set messageContent = #{messagecontent,jdbcType=VARCHAR},
+      writeDate = #{writedate,jdbcType=TIMESTAMP},
+      count = #{count,jdbcType=INTEGER},
+      productID = #{productid,jdbcType=INTEGER},
+      userID = #{userid,jdbcType=CHAR}
+    where messageID = #{messageid,jdbcType=INTEGER}
+  </update>
+</mapper>

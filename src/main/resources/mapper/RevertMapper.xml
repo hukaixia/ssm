@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="jmu.hkx.dao.RevertMapper">
+  <resultMap id="BaseResultMap" type="jmu.hkx.vo.Revert">
+    <id column="revertID" jdbcType="INTEGER" property="revertid" />
+    <result column="revertContent" jdbcType="VARCHAR" property="revertcontent" />
+    <result column="writeDate" jdbcType="TIMESTAMP" property="writedate" />
+    <result column="messageID" jdbcType="INTEGER" property="messageid" />
+    <result column="userID" jdbcType="CHAR" property="userid" />
+  </resultMap>
+  <resultMap id="WithUserResultMap" type="jmu.hkx.vo.Revert">
+    <id column="revertID" jdbcType="INTEGER" property="revertid" />
+    <result column="revertContent" jdbcType="VARCHAR" property="revertcontent" />
+    <result column="writeDate" jdbcType="TIMESTAMP" property="writedate" />
+    <result column="messageID" jdbcType="INTEGER" property="messageid" />
+    <association property="user" javaType="User">
+        <id column="userID" property="userid"/>
+        <result column="userName" property="username"/>
+        <result column="userImage" property="userimage"/>
+    </association>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    revertID, revertContent, writeDate, messageID, userID
+  </sql>
+   <sql id="WithUser_Column_List">
+    revertID, revertContent, writeDate, messageID,user.userID,userName,userImage
+  </sql>
+  <!-- 
+   List<Revert> selectByExampleWithUser(RevertExample example);
+
+    Revert selectByPrimaryKeyWithUser(Integer revertid);
+   -->
+  <select id="selectByPrimaryKeyWithUser" resultMap="WithUserResultMap">
+    select 
+    <include refid="WithUser_Column_List" />
+    from revert left join user on revert.userID=user.userID
+    where revertID = #{revertid,jdbcType=INTEGER}
+  </select>
+  <select id="selectByExampleWithUser" resultMap="WithUserResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="WithUser_Column_List" />
+    from revert left join user on revert.userID=user.userID
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from revert
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from revert
+    where revertID = #{revertid,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from revert
+    where revertID = #{revertid,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="jmu.hkx.vo.RevertExample">
+    delete from revert
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="jmu.hkx.vo.Revert">
+    insert into revert (revertID, revertContent, writeDate, 
+      messageID, userID)
+    values (#{revertid,jdbcType=INTEGER}, #{revertcontent,jdbcType=VARCHAR}, #{writedate,jdbcType=TIMESTAMP}, 
+      #{messageid,jdbcType=INTEGER}, #{userid,jdbcType=CHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="jmu.hkx.vo.Revert">
+    insert into revert
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="revertid != null">
+        revertID,
+      </if>
+      <if test="revertcontent != null">
+        revertContent,
+      </if>
+      <if test="writedate != null">
+        writeDate,
+      </if>
+      <if test="messageid != null">
+        messageID,
+      </if>
+      <if test="userid != null">
+        userID,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="revertid != null">
+        #{revertid,jdbcType=INTEGER},
+      </if>
+      <if test="revertcontent != null">
+        #{revertcontent,jdbcType=VARCHAR},
+      </if>
+      <if test="writedate != null">
+        #{writedate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="messageid != null">
+        #{messageid,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null">
+        #{userid,jdbcType=CHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="jmu.hkx.vo.RevertExample" resultType="java.lang.Long">
+    select count(*) from revert
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update revert
+    <set>
+      <if test="record.revertid != null">
+        revertID = #{record.revertid,jdbcType=INTEGER},
+      </if>
+      <if test="record.revertcontent != null">
+        revertContent = #{record.revertcontent,jdbcType=VARCHAR},
+      </if>
+      <if test="record.writedate != null">
+        writeDate = #{record.writedate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.messageid != null">
+        messageID = #{record.messageid,jdbcType=INTEGER},
+      </if>
+      <if test="record.userid != null">
+        userID = #{record.userid,jdbcType=CHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update revert
+    set revertID = #{record.revertid,jdbcType=INTEGER},
+      revertContent = #{record.revertcontent,jdbcType=VARCHAR},
+      writeDate = #{record.writedate,jdbcType=TIMESTAMP},
+      messageID = #{record.messageid,jdbcType=INTEGER},
+      userID = #{record.userid,jdbcType=CHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="jmu.hkx.vo.Revert">
+    update revert
+    <set>
+      <if test="revertcontent != null">
+        revertContent = #{revertcontent,jdbcType=VARCHAR},
+      </if>
+      <if test="writedate != null">
+        writeDate = #{writedate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="messageid != null">
+        messageID = #{messageid,jdbcType=INTEGER},
+      </if>
+      <if test="userid != null">
+        userID = #{userid,jdbcType=CHAR},
+      </if>
+    </set>
+    where revertID = #{revertid,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="jmu.hkx.vo.Revert">
+    update revert
+    set revertContent = #{revertcontent,jdbcType=VARCHAR},
+      writeDate = #{writedate,jdbcType=TIMESTAMP},
+      messageID = #{messageid,jdbcType=INTEGER},
+      userID = #{userid,jdbcType=CHAR}
+    where revertID = #{revertid,jdbcType=INTEGER}
+  </update>
+</mapper>
