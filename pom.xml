@@ -51,7 +51,7 @@ xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xs
       <dependency>
 	    <groupId>mysql</groupId>
 	    <artifactId>mysql-connector-java</artifactId>
-	    <version>8.0.13</version>
+	    <version>8.0.16</version>
 	  </dependency>
 	  <!-- jstl,servlet,junit -->
 
